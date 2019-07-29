@@ -129,12 +129,12 @@ public class RESTResponse {
             return this;
         }
 
-        public Success addData(Object obj) {
+        public Success setData(Object obj) {
             this.data = obj;
             return this;
         }
 
-        public Success addData(Iterable listObj) {
+        public Success setData(Iterable listObj) {
             this.data = new ArrayList<>();
             this.data = listObj;
             return this;

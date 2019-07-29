@@ -36,7 +36,7 @@ public class StudentController {
         return new ResponseEntity<>(new RESTResponse.Success()
                 .setStatus(HttpStatus.OK.value())
                 .setMessage("Success!")
-                .addData(studentDto)
+                .setData(studentDto)
                 .build(), HttpStatus.OK);
     }
 }
