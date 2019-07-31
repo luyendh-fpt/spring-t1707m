@@ -1,6 +1,10 @@
 package t1707m.spring.dto;
 
+import t1707m.spring.entity.Student;
+
 import javax.persistence.Id;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
 import java.util.Calendar;
 
 public class StudentDto {
@@ -10,6 +14,11 @@ public class StudentDto {
 
     public StudentDto() {
 
+    }
+
+    public StudentDto(Student student) {
+        this.id = student.getId();
+        this.name = student.getName();
     }
 
     public long getId() {
