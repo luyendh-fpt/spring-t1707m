@@ -6,6 +6,8 @@ import t1707m.spring.repository.StudentRepository;
 
 import javax.persistence.*;
 import java.util.Calendar;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Student {
@@ -16,7 +18,9 @@ public class Student {
     private String username;
     private String password;
     private String name;
-    private String role;
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "students")
+    private Set<Role> roles;
 
     public Student() {
 
@@ -32,12 +36,23 @@ public class Student {
         this.name = studentDto.getName();
     }
 
-    public String getRole() {
-        return role;
+    public Set<Role> getRoles() {
+        if (this.roles == null) {
+            this.roles = new HashSet<>();
+        }
+        return roles;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
+
+    public void addRole(Role role) {
+        if (this.roles == null) {
+            this.roles = new HashSet<>();
+        }
+        role.addStudent(this);
+        this.roles.add(role);
     }
 
     public String getUsername() {
