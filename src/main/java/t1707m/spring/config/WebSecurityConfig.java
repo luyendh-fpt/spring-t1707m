@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -15,9 +16,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
+//@EnableGlobalMethodSecurity(
+//        jsr250Enabled = true,
+//        securedEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean(name = "bCryptPasswordEncoder")
@@ -32,13 +37,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    protected AuthenticationFailureHandler authenticationFailureHandler(){
+    protected AuthenticationFailureHandler authenticationFailureHandler() {
         return new MyAuthenticationFailureHandle();
     }
 
     @Bean
-    protected AuthenticationSuccessHandler authenticationSuccessHandler(){
+    protected AuthenticationSuccessHandler authenticationSuccessHandler() {
         return new MyAuthenticationSuccessHandle();
+    }
+
+    @Bean
+    protected CaptchaFilter captchaFilter() {
+        return new CaptchaFilter();
     }
 
     @Override
@@ -47,9 +57,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/register").permitAll()
                 .antMatchers("/").hasAnyAuthority("ADMIN,STUDENT")
-                .antMatchers("/employee").hasAnyAuthority("EMPLOYEE")
                 .anyRequest().authenticated()
                 .and()
+                .addFilterBefore(new CaptchaFilter(), UsernamePasswordAuthenticationFilter.class)
                 .formLogin()
                 .loginPage("/login")
                 .permitAll()
@@ -57,7 +67,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .successHandler(authenticationSuccessHandler())
                 .and()
                 .logout()
-                .permitAll();
+                .permitAll()
+                .and()
+                .exceptionHandling()
+                .accessDeniedPage("/custom-error");
     }
 
 }

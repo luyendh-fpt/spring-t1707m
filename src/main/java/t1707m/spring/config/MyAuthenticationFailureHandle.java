@@ -3,6 +3,7 @@ package t1707m.spring.config;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -12,7 +13,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class MyAuthenticationFailureHandle implements AuthenticationFailureHandler {
+public class MyAuthenticationFailureHandle extends SimpleUrlAuthenticationFailureHandler {
 
     private static Logger LOGGER = Logger.getLogger(MyAuthenticationFailureHandle.class.getSimpleName());
 
@@ -29,7 +30,10 @@ public class MyAuthenticationFailureHandle implements AuthenticationFailureHandl
             LOGGER.log(Level.SEVERE, String.format("Error with message: "), ex);
         }
         session.setAttribute("failureCount", failureCount);
+        if (failureCount >= 3) {
+            session.setAttribute("needCaptcha", 1);
+        }
         LOGGER.log(Level.INFO, String.format("Failure count: %d", failureCount));
-        request.getRequestDispatcher("/login?error").forward(request, response);
+        super.onAuthenticationFailure(request, response, new BadCredentialsException("* Sai thông tin đăng nhập, vui lòng thử lại!"));
     }
 }

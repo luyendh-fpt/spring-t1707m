@@ -16,7 +16,7 @@
     <form th:action="@{/login}" method="post">
         <div><label> User Name : <input type="text" name="username"/> </label></div>
         <div><label> Password: <input type="password" name="password"/> </label></div>
-        <div th:if="${session.containsKey('failureCount')} AND ${session.failureCount} !=null AND ${session.failureCount} >= 3"
+        <div th:if="${session.containsKey('needCaptcha')} AND ${session.needCaptcha} !=null AND ${session.needCaptcha} == 1"
              class="g-recaptcha" data-sitekey="6LclSLEUAAAAAM7kl5HhPiDaz-dyjwaERGWo_Jk2"></div>
         <div><input type="submit" value="Sign In"/></div>
     </form>

@@ -1,6 +1,9 @@
 package t1707m.spring.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -11,6 +14,7 @@ import t1707m.spring.entity.Student;
 import t1707m.spring.repository.RoleRepository;
 import t1707m.spring.repository.StudentRepository;
 
+import javax.annotation.security.RolesAllowed;
 import java.util.List;
 
 @Controller
@@ -33,6 +37,8 @@ public class HelloController {
 
 
     @GetMapping(value = "/employee")
+//    @RolesAllowed("EMPLOYEE")
+//    @Secured("EMPLOYEE")
     @ResponseBody
     public String employee() {
         return "Okie, employee";
@@ -41,6 +47,11 @@ public class HelloController {
     @GetMapping(value = "/login")
     public String login() {
         return "login";
+    }
+
+    @GetMapping(value = "/custom-error")
+    public String error() {
+        return "custom-error";
     }
 
     @GetMapping(value = "/register")
