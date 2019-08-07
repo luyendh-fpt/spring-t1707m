@@ -19,7 +19,10 @@ public class Student {
     private String password;
     private String name;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "students")
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(name = "student_role",
+            joinColumns = @JoinColumn(name = "student_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
 
     public Student() {
@@ -85,5 +88,59 @@ public class Student {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+
+    public static final class Builder {
+        private Long id;
+        private String username;
+        private String password;
+        private String name;
+        private Set<Role> roles;
+
+        private Builder() {
+        }
+
+        public static Builder aStudent() {
+            return new Builder();
+        }
+
+        public Builder withId(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder withUsername(String username) {
+            this.username = username;
+            return this;
+        }
+
+        public Builder withPassword(String password) {
+            this.password = password;
+            return this;
+        }
+
+        public Builder withName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder withRole(Role role) {
+            if(this.roles == null){
+                this.roles = new HashSet<>();
+            }
+            this.roles.add(role);
+            return this;
+        }
+
+        public Student build() {
+            Student student = new Student();
+            student.setId(id);
+            student.setUsername(username);
+            student.setPassword(password);
+            student.setName(name);
+            student.setRoles(roles);
+            return student;
+        }
     }
 }

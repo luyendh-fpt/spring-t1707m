@@ -1,5 +1,6 @@
 package t1707m.spring.controller;
 
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PostAuthorize;
@@ -8,13 +9,17 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
+import t1707m.spring.dto.StudentDto;
 import t1707m.spring.entity.Role;
 import t1707m.spring.entity.Student;
 import t1707m.spring.repository.RoleRepository;
 import t1707m.spring.repository.StudentRepository;
 
 import javax.annotation.security.RolesAllowed;
+import javax.validation.Valid;
 import java.util.List;
 
 @Controller
@@ -55,23 +60,38 @@ public class HelloController {
     }
 
     @GetMapping(value = "/register")
-    public String sayHello(Model model) {
-        model.addAttribute("student", new Student());
+    public String register(Model model) {
+        model.addAttribute("student", new StudentDto());
+        model.addAttribute("roles", roleRepository.findAll());
         return "register";
     }
 
-    @RequestMapping(value = "/register", method = RequestMethod.POST)
-    @ResponseBody
-    public Student sayGoodbye(
-            @ModelAttribute Student student) {
-        List<Role> roles = roleRepository.findAll();
-        for (Role role :
-                roles) {
-            student.addRole(role);
+    @PostMapping(value = "/register")
+    public String signup(Model model,
+                         @ModelAttribute("student") @Valid StudentDto studentDto,
+                         BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("roles", roleRepository.findAll());
+            model.addAttribute("student", studentDto);
+            return "register";
         }
-        student.setPassword(bCryptPasswordEncoder.encode(student.getPassword()));
+        System.out.println(studentDto.getRole());
+        Role role = roleRepository.findById(studentDto.getRole()).orElse(null);
+        if (role == null) {
+            bindingResult.addError(new ObjectError("role", "Invalid role"));
+            model.addAttribute("roles", roleRepository.findAll());
+            model.addAttribute("student", studentDto);
+            return "register";
+        }
+        Student student = Student.Builder.aStudent()
+                .withName(studentDto.getName())
+                .withUsername(studentDto.getUsername())
+                .withPassword(bCryptPasswordEncoder.encode(studentDto.getPassword()))
+                .withRole(role)
+                .build();
+//        role.addStudent(student);
         studentRepository.save(student);
-        return student;
+        return "register-success";
     }
 
 }
