@@ -5,7 +5,7 @@
     <title>Title</title>
 </head>
 <body>
-<h1>Hello you!</h1>
+<h1 th:text="#{register.header}"></h1>
 
 <form th:action="@{/register}" th:method="post" th:object="${student}">
     <div>

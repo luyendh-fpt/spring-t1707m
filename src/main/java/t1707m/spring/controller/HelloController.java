@@ -2,6 +2,8 @@ package t1707m.spring.controller;
 
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,6 +23,7 @@ import t1707m.spring.repository.StudentRepository;
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Locale;
 
 @Controller
 public class HelloController {
@@ -33,6 +36,9 @@ public class HelloController {
 
     @Autowired
     PasswordEncoder bCryptPasswordEncoder;
+
+    @Autowired
+    MessageSource messageSource;
 
     @GetMapping(value = "/")
     @ResponseBody
@@ -61,6 +67,7 @@ public class HelloController {
 
     @GetMapping(value = "/register")
     public String register(Model model) {
+        System.out.println(messageSource.getMessage("index.welcome", null, LocaleContextHolder.getLocale()));
         model.addAttribute("student", new StudentDto());
         model.addAttribute("roles", roleRepository.findAll());
         return "register";
