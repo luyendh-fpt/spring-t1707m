@@ -7,11 +7,14 @@
 <body>
 <h1 th:text="#{register.header}"></h1>
 
-<form th:action="@{/register}" th:method="post" th:object="${student}">
+<form  th:action="@{/register}" th:method="post" th:object="${student}" enctype="multipart/form-data">
     <div>
         <select th:field="*{role}">
             <option th:value="${r.id}" th:each="r : ${roles}" th:text="${r.name}"></option>
         </select>
+    </div>
+    <div>
+        Image <input type="file" name="file">
     </div>
     <div>
         Name <input type="text" th:field="*{name}">

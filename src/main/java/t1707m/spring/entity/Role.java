@@ -11,7 +11,8 @@ public class Role {
     private long id;
     private String name;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "roles")
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL,
+            mappedBy = "roles")
     private Set<Student> students;
 
     public Set<Student> getStudents() {

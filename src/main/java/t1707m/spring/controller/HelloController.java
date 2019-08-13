@@ -14,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import t1707m.spring.dto.StudentDto;
 import t1707m.spring.entity.Role;
 import t1707m.spring.entity.Student;
@@ -21,7 +22,11 @@ import t1707m.spring.repository.RoleRepository;
 import t1707m.spring.repository.StudentRepository;
 
 import javax.annotation.security.RolesAllowed;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.List;
 import java.util.Locale;
 
@@ -65,18 +70,45 @@ public class HelloController {
         return "custom-error";
     }
 
+    @GetMapping(value = "/demo-upload")
+    public String demoUpload() {
+        return "demo-upload";
+    }
+
+    @RequestMapping(value = "/de-upload", method = RequestMethod.POST)
+    @ResponseBody
+    public String deUpload(@RequestParam(name = "file") MultipartFile file, HttpServletRequest request) {
+        return "de-uploaed";
+    }
+
     @GetMapping(value = "/register")
     public String register(Model model) {
-        System.out.println(messageSource.getMessage("index.welcome", null, LocaleContextHolder.getLocale()));
         model.addAttribute("student", new StudentDto());
         model.addAttribute("roles", roleRepository.findAll());
         return "register";
     }
 
-    @PostMapping(value = "/register")
-    public String signup(Model model,
-                         @ModelAttribute("student") @Valid StudentDto studentDto,
-                         BindingResult bindingResult) {
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    public String signup(
+            @RequestParam("file") MultipartFile file,
+            @ModelAttribute("student") @Valid StudentDto studentDto,
+            BindingResult bindingResult,
+            Model model) {
+        if (file != null && !file.isEmpty()) {
+            System.out.println("Uploading file");
+            long currentTime = System.currentTimeMillis();
+            String saveName = currentTime + file.getOriginalFilename();
+            try {
+                File image = new File("upload/" + saveName);
+                BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(image));
+                stream.write(file.getBytes());
+                stream.close();
+            } catch (Exception e) {
+                System.out.println(String.format("Error when upload file.", saveName, e.getMessage()));
+                e.printStackTrace();
+            }
+        }
+        System.out.println("Binding error.");
         if (bindingResult.hasErrors()) {
             model.addAttribute("roles", roleRepository.findAll());
             model.addAttribute("student", studentDto);
